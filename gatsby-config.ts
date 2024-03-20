@@ -14,7 +14,8 @@ const config: GatsbyConfig = {
     options: {
       "icon": "src/images/curioicon.png"
     }
-  }, 
+  },
+  "gatsby-plugin-react-helmet", 
   {
     resolve: `gatsby-plugin-google-gtag`,
     options: {
