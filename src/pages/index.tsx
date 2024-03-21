@@ -35,6 +35,9 @@ const IndexPage: React.FC<PageProps> = () => {
     user
     } = useAuth0();
 
+    console.log(process.env.AUTH0_DOMAIN)
+    console.log(process.env.AUTH0_CLIENTID)
+
   return (
     <>
      <Helmet>
