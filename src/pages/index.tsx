@@ -35,8 +35,8 @@ const IndexPage: React.FC<PageProps> = () => {
     user
     } = useAuth0();
 
-    console.log(process.env.AUTH0_DOMAIN)
-    console.log(process.env.AUTH0_CLIENTID)
+    console.log(process.env.GATSBY_AUTH0_DOMAIN)
+    console.log(process.env.GATSBY_AUTH0_CLIENTID)
 
   return (
     <>
