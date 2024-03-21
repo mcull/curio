@@ -16,6 +16,7 @@ const headingStyles = {
   marginBottom: 0,
   fontSize: 48,
   color: "#FFFFFF",
+  fontFamily: "cormorant",
 };
 
 const greetUser = (user: any) => {
@@ -35,25 +36,19 @@ const IndexPage: React.FC<PageProps> = () => {
     user
     } = useAuth0();
 
-    console.log(process.env.GATSBY_AUTH0_DOMAIN)
-    console.log(process.env.GATSBY_AUTH0_CLIENTID)
-
   return (
     <>
      <Helmet>
-      <style>{`body { background-color: black; }`}</style>
+      <style>{`body { background-color: black;}`}</style>
     </Helmet>
     <main style={pageStyles}>
    
       <div style={{ maxWidth: "fit-content", marginLeft: "auto", marginRight: "auto", textAlign: "center"}}>
         <h1 style={headingStyles}>
-          .curio.
+        .curio&middot;
         </h1>
 
-        <StaticImage
-          alt="Curio Logo"
-          src="../images/ourcurio.png"
-        />
+        <img alt="Cabinet of curiosities" src="ourcurio.png" />
         <div style={{color:"red"}}><LoginButton /></div>
         {isAuthenticated && greetUser(user)}
         <div style={{color:"red"}}><LogoutButton /></div>

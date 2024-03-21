@@ -5,8 +5,8 @@ const config: GatsbyConfig = {
     title: `curio`,
     siteUrl: `https://ourcurio.xyz`,
     description: `A set of quick proof of concept projects mostly built with AI`,
-    image: `/src/images/curioicon.png`
-
+    image: `ourcurio.png`,
+    twitterUsername: `marccull`
   },
   // More easily incorporate content into your pages through automatic TypeScript type generation and better GraphQL IntelliSense.
   // If you use VSCode you can also use the GraphQL plugin
@@ -16,6 +16,17 @@ const config: GatsbyConfig = {
     resolve: 'gatsby-plugin-manifest',
     options: {
       "icon": "src/images/curioicon.png"
+    }
+  },
+  {
+    resolve: `gatsby-plugin-google-fonts`,
+    options: {
+      fonts: [
+        `limelight`,
+        `source sans pro\:300,400,400i,700`, // you can also specify font weights and styles
+        `cormorant:ital,wght@0,300..700;1,300..700&family=Montserrat:ital,wght@0,100..900;1,100..900`
+      ],
+      display: 'swap'
     }
   },
   "gatsby-plugin-react-helmet", 
