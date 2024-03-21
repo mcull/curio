@@ -3,6 +3,7 @@ import "./src/styles/global.css"
 //gatsby-browser.js
 import React from 'react';
 import { Auth0Provider } from '@auth0/auth0-react';
+import { Helmet } from "react-helmet";
 import { navigate } from 'gatsby';
 
 const onRedirectCallback = (appState) => {
@@ -19,6 +20,9 @@ export const wrapRootElement = ({ element }) => {
    redirectUri={window && window.location.origin}
    onRedirectCallback={onRedirectCallback}
    >
+      <Helmet>
+      <html lang="en" />
+    </Helmet>
     {element}
  </Auth0Provider>
  );

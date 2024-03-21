@@ -1,0 +1,11 @@
+{
+    "type": "module",
+    "dependencies": {
+      "dotenv": "^16.4.5",
+      "filenamify": "^6.0.0",
+      "image-downloader": "^4.3.0",
+      "node-fetch": "^3.3.2",
+      "openai": "^4.28.0",
+      "human-id": "^4.1.1"
+    }
+} 
