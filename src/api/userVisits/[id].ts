@@ -1,8 +1,6 @@
 
 import { GatsbyFunctionRequest, GatsbyFunctionResponse } from "gatsby"
-import { Guid } from "guid-typescript";
 import { Client } from "pg";
-import { CurioUserVisit } from "../../models/user_visits"
 
 interface UserVisitRequest {
   id: string
@@ -50,7 +48,6 @@ async function getUserVisits(userId: string) {
   let responseCode = 200;
   const client = new Client(process.env.DATABASE_URL);
   await client.connect();
-  console.log(userId);
   const query = 
       `SELECT uv.visit_id, uv.user_id, uv.visit_date
         FROM USER_VISITS uv
@@ -58,7 +55,6 @@ async function getUserVisits(userId: string) {
   try {
     let body = {};
       const results = await client.query(query, [userId]);
-      console.log(results);
       if (results.rows.length > 0) {
         body = results.rows;
       } else {
