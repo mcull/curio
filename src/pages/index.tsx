@@ -1,11 +1,14 @@
-import * as React from "react"
+import React, { useEffect, useState, Suspense } from 'react';
 import { Helmet } from "react-helmet"
 import type { HeadFC, PageProps } from "gatsby"
 import { SEO } from "../components/seo"
 import { StaticImage } from "gatsby-plugin-image"
+import { CurioUser } from "../models/user"
 import  LoginButton  from "../components/login-button"
 import LogoutButton from "../components/logout-button";
 import { useAuth0 } from "@auth0/auth0-react";
+import UserGreeting from '../components/user-greeting';
+import { addUser, addUserVisit } from "../utils/user-manager";
 
 const pageStyles = {
   color: "#ffffff",
@@ -20,31 +23,45 @@ const headingStyles = {
   fontFamily: "Cormorant, sans-serif",
 };
 
-const greetUser = (user: any) => {
-  if (user) {
-    fetch(`/api/users/${user.email}`)
-      .then((response) => response.json())
-      .then((data) => console.log(data));
-    ;
-    return (
-    <div style={{textAlign: "center"}}>
-      <div style={{padding: "25px"}}>{user.name ? user.name : user.email} </div>
-      <img width={64}  style={{border: "white 3px solid", borderRadius: "50%", marginLeft: "auto", marginRight: "auto" }} src={user.picture} alt={user.name} />
-    </div>
-    )}
+function updateUser(user: any, callback: any) {
+  if (!user) {
+    return;
+  }
+  let curioUser:CurioUser = new CurioUser();
+  (async () => {
+    const response = await fetch(`/api/users/${user.email}`);
+    if (response.status === 404) {
+      // first time here!
+      addUser(user.email);
+    } else {
+      const content = await response.json();
+      curioUser = content;
+    }
+    const lastVisit = curioUser.visits[0];
+    if (lastVisit === null || (user.updated_at && lastVisit < user.updated_at)) {
+      console.log("updating user for some reason sad face");
+      addUserVisit(curioUser.id);
+    }
+  })();
+  callback();
 }
 
+
 const IndexPage: React.FC<PageProps> = () => {
+  const [userUpdated, setUserUpdated] = React.useState(false);
   const {
     isAuthenticated,
     logout,
     user
     } = useAuth0();
 
-    if (isAuthenticated) {  
-      console.log(user)
-    }
-
+    useEffect(() => {
+      
+      if (!userUpdated) {
+        updateUser(user, () => setUserUpdated(true));
+      }
+    });
+    
   return (
     <>
      <Helmet>
@@ -59,7 +76,10 @@ const IndexPage: React.FC<PageProps> = () => {
 
         <StaticImage src="../images/ourcurio.png" alt="Illustration of a cabinet of curiosities" />
         <div style={{color:"red"}}><LoginButton /></div>
-        {isAuthenticated && greetUser(user)}
+        <Suspense fallback={<p/>}>
+          <div>{isAuthenticated && UserGreeting(user)}</div>
+        </Suspense>
+        
         <div style={{color:"red"}}><LogoutButton /></div>
       </div>
     </main>

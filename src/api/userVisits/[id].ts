@@ -12,6 +12,7 @@ export default async function handler(
 ) {
   const method  = req.method;
   const userId = req.params.id
+
   if (!userId) {
     res.status(400).send("Missing email parameter")
   }
@@ -28,6 +29,7 @@ export default async function handler(
       break;
     } 
     case 'POST': {  
+      console.log(req.body);
       response = await addUserVisit(userId);
       break;
     } 

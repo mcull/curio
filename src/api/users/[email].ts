@@ -1,6 +1,5 @@
 
 import { GatsbyFunctionRequest, GatsbyFunctionResponse } from "gatsby"
-import { Guid } from "guid-typescript";
 import { Client } from "pg";
 import { CurioUser } from "../../models/user"
 
@@ -54,7 +53,8 @@ async function getUser(userEmail: string) {
       `SELECT u.id, u.email, uv.visit_date
         FROM USERS u
         LEFT JOIN user_visits uv ON u.id = uv.user_id
-        WHERE u.email = $1`;
+        WHERE u.email = $1
+        ORDER BY uv.visit_date DESC`;
   try {
       const results = await client.query(query, [userEmail]);
       let user = new CurioUser();
@@ -77,13 +77,12 @@ async function getUser(userEmail: string) {
 }
 
 async function addUser(userEmail: string) {
-  const newId:string = Guid.create().toString();
   const client = new Client(process.env.DATABASE_URL);
   await client.connect();
   
-  const query = `INSERT INTO USERS (id, email) VALUES ($1, $2) RETURNING *;`
+  const query = `INSERT INTO USERS (email) VALUES ($1) RETURNING *;`
   try {
-    const results = await client.query(query, [newId, userEmail]);
+    const results = await client.query(query, [userEmail]);
     return {status: "success", statusCode: 201, body: JSON.stringify(results.rows[0])};
   } catch (err) {
     return {status: "error", statusCode: 500, body: JSON.stringify(err)};
