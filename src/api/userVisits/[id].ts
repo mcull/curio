@@ -2,19 +2,19 @@
 import { GatsbyFunctionRequest, GatsbyFunctionResponse } from "gatsby"
 import { Guid } from "guid-typescript";
 import { Client } from "pg";
-import { CurioUser } from "../../models/user"
+import { CurioUserVisit } from "../../models/user_visits"
 
-interface UserRequest {
-  email: string
+interface UserVisitRequest {
+  id: string
 }
 
 export default async function handler(
-  req: GatsbyFunctionRequest<UserRequest>,
+  req: GatsbyFunctionRequest<UserVisitRequest>,
   res: GatsbyFunctionResponse
 ) {
   const method  = req.method;
-  const userEmail = req.params.email
-  if (!userEmail) {
+  const userId = req.params.id
+  if (!userId) {
     res.status(400).send("Missing email parameter")
   }
 
@@ -26,17 +26,17 @@ export default async function handler(
   let response = { status: "success", statusCode: 200, body: "" };
   switch(method) { 
     case 'GET': { 
-      response = await getUser(userEmail);
+      response = await getUserVisits(userId);
       break;
     } 
     case 'POST': {  
-       response = await addUser(userEmail);
-       break;
+      response = await addUserVisit(userId);
+      break;
     } 
     case 'DELETE': { 
-       response = await deleteUser(userEmail); 
-       console.log(response);
-       break;
+      const userVisitId = BigInt(userId);
+      response = await deleteUserVisit(userVisitId); 
+      break;
     }
     default: { 
        response = {status: "error", statusCode: 500, body: `{Unsupported method:  ${method}}`}; 
@@ -46,26 +46,22 @@ export default async function handler(
   res.status(response.statusCode).json(JSON.parse(response.body));
 }
 
-async function getUser(userEmail: string) {
+async function getUserVisits(userId: string) {
   let responseCode = 200;
   const client = new Client(process.env.DATABASE_URL);
   await client.connect();
+  console.log(userId);
   const query = 
-      `SELECT u.id, u.email, uv.visit_date
-        FROM USERS u
-        LEFT JOIN user_visits uv ON u.id = uv.user_id
-        WHERE u.email = $1`;
+      `SELECT uv.visit_id, uv.user_id, uv.visit_date
+        FROM USER_VISITS uv
+        WHERE uv.user_id = $1`;
   try {
-      const results = await client.query(query, [userEmail]);
-      let user = new CurioUser();
-      let body = null;
+    let body = {};
+      const results = await client.query(query, [userId]);
+      console.log(results);
       if (results.rows.length > 0) {
-        user.id = results.rows[0].id;
-        user.email = results.rows[0].email;
-        user.visits = results.rows.map((row: { visit_date: string }) => row.visit_date);
-        body = user;
+        body = results.rows;
       } else {
-        body = {};
         responseCode = 404;
       }
       return {status: "success", statusCode: responseCode, body: JSON.stringify(body)};
@@ -76,14 +72,13 @@ async function getUser(userEmail: string) {
   }
 }
 
-async function addUser(userEmail: string) {
-  const newId:string = Guid.create().toString();
+async function addUserVisit(userId: string) {
   const client = new Client(process.env.DATABASE_URL);
   await client.connect();
   
-  const query = `INSERT INTO USERS (id, email) VALUES ($1, $2) RETURNING *;`
+  const query = `INSERT INTO USER_VISITS (user_id) VALUES ($1) RETURNING *;`
   try {
-    const results = await client.query(query, [newId, userEmail]);
+    const results = await client.query(query, [userId]);
     return {status: "success", statusCode: 201, body: JSON.stringify(results.rows[0])};
   } catch (err) {
     return {status: "error", statusCode: 500, body: JSON.stringify(err)};
@@ -92,13 +87,15 @@ async function addUser(userEmail: string) {
   }
 }
 
-async function deleteUser(userEmail: string) {
+async function deleteUserVisit(userVisitId: bigint) {
   const client = new Client(process.env.DATABASE_URL);
   await client.connect();
-  const query = `DELETE FROM USERS WHERE email = $1;`
+  const query = `DELETE FROM USER_VISITS WHERE visit_id = $1;`
   try {
-    const results = await client.query(query, [userEmail]);
-    return {status: "success", statusCode: 204, body: "{}"};
+    
+    const results = await client.query(query, [userVisitId]);
+    console.log(results);
+    return {status: "success", statusCode: 200, body: "{}"};
   } catch (err) {
     return {status: "error", statusCode: 500, body: JSON.stringify(err)};
   } finally {

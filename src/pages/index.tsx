@@ -22,6 +22,10 @@ const headingStyles = {
 
 const greetUser = (user: any) => {
   if (user) {
+    fetch(`/api/users/${user.email}`)
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+    ;
     return (
     <div style={{textAlign: "center"}}>
       <div style={{padding: "25px"}}>{user.name ? user.name : user.email} </div>
