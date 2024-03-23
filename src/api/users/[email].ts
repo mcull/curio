@@ -26,7 +26,7 @@ export default async function handler(
 
   let response = { status: "success", statusCode: 200, body: "" };
   switch(method) { 
-    case 'GETX': { 
+    case 'GET': { 
       response = await getUser(userEmail);
       break;
     } 
@@ -40,7 +40,7 @@ export default async function handler(
        break;
     }
     default: { 
-       response = {status: "error", statusCode: 500, body: `Unsupported method:  ${method}`}; 
+       response = {status: "error", statusCode: 500, body: `{Unsupported method:  ${method}}`}; 
        break; 
     } 
   } 
