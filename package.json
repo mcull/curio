@@ -29,6 +29,8 @@
     "gatsby-plugin-sitemap": "^6.13.1",
     "gatsby-source-filesystem": "^5.13.1",
     "gatsby-transformer-sharp": "^5.13.1",
+    "guid-typescript": "^1.0.9",
+    "pg": "^8.11.3",
     "postcss": "^8.4.37",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -38,6 +40,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/node": "^20.11.19",
+    "@types/pg": "^8.11.4",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@types/react-helmet": "^6.1.11",

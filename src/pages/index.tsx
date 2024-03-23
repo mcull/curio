@@ -37,6 +37,10 @@ const IndexPage: React.FC<PageProps> = () => {
     user
     } = useAuth0();
 
+    if (isAuthenticated) {  
+      console.log(user)
+    }
+
   return (
     <>
      <Helmet>
