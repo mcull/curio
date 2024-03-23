@@ -7,8 +7,8 @@ import { CurioUser } from "../models/user"
 import  LoginButton  from "../components/login-button"
 import LogoutButton from "../components/logout-button";
 import { useAuth0 } from "@auth0/auth0-react";
-import UserGreeting from '../components/user-greeting';
 import { addUser, addUserVisit } from "../utils/user-manager";
+import ordinal from "ordinal";
 
 const pageStyles = {
   color: "#ffffff",
@@ -23,44 +23,60 @@ const headingStyles = {
   fontFamily: "Cormorant, sans-serif",
 };
 
-function updateUser(user: any, callback: any) {
-  if (!user) {
-    return;
+const UserGreeting = (auth0User:any, curioUser:CurioUser) => {
+  if (!auth0User || !curioUser) {
+    return null;
   }
-  let curioUser:CurioUser = new CurioUser();
-  (async () => {
-    const response = await fetch(`/api/users/${user.email}`);
-    if (response.status === 404) {
-      // first time here!
-      addUser(user.email);
-    } else {
-      const content = await response.json();
-      curioUser = content;
-    }
-    const lastVisit = curioUser.visits[0];
-    if (lastVisit === null || (user.updated_at && lastVisit < user.updated_at)) {
-      console.log("updating user for some reason sad face");
-      addUserVisit(curioUser.id);
-    }
-  })();
-  callback();
+  return (
+  <div style={{textAlign: "center"}}>
+        <div style={{paddingTop: "25px"}}>{auth0User.name ? auth0User.name : auth0User.email}</div>
+        <div>This is your {ordinal(curioUser.visits.length)} visit!</div>
+        <img width={64} style={{border: "white 3px solid", borderRadius: "50%", marginLeft: "auto", marginRight: "auto" }} src={auth0User.picture} alt={auth0User.name} />
+      </div>
+  )
 }
 
-
 const IndexPage: React.FC<PageProps> = () => {
-  const [userUpdated, setUserUpdated] = React.useState(false);
+  const [curioUser, setCurioUser] = React.useState(new CurioUser());
+
   const {
     isAuthenticated,
     logout,
     user
     } = useAuth0();
-
-    useEffect(() => {
-      
-      if (!userUpdated) {
-        updateUser(user, () => setUserUpdated(true));
+  
+  const updateUser = async () => {
+    if (!user || curioUser.id !== "") {
+      return;
+    }
+    let cUser:CurioUser = new CurioUser();
+    
+    const response = await fetch(`/api/users/${user.email}`);
+    if (response.status === 404) {
+      // first time here!
+      cUser = addUser(user.email);
+    } else {
+      const content = await response.json();
+      cUser = content;
+    }
+    const incrementedVisitCount = localStorage.getItem("incrementedVisitCount");
+    if (!incrementedVisitCount) {
+      const lastVisit = cUser.visits[0];
+      if (!lastVisit || (user.updated_at && lastVisit < user.updated_at)) {
+        addUserVisit(cUser.id);
+        localStorage.setItem("incrementedVisitCount", "true");
       }
-    });
+    } 
+    setCurioUser(cUser);
+  }
+
+  if (!isAuthenticated) {
+    localStorage.removeItem("incrementedVisitCount");
+  }
+
+  useEffect(() => {
+    updateUser();
+  });
     
   return (
     <>
@@ -76,10 +92,9 @@ const IndexPage: React.FC<PageProps> = () => {
 
         <StaticImage src="../images/ourcurio.png" alt="Illustration of a cabinet of curiosities" />
         <div style={{color:"red"}}><LoginButton /></div>
-        <Suspense fallback={<p/>}>
-          <div>{isAuthenticated && UserGreeting(user)}</div>
-        </Suspense>
-        
+        <div>
+          {isAuthenticated && UserGreeting(user, curioUser)}
+        </div>
         <div style={{color:"red"}}><LogoutButton /></div>
       </div>
     </main>
