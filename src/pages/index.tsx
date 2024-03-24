@@ -25,7 +25,6 @@ const headingStyles = {
 
 const UserGreeting = (auth0User:any, curioUser:CurioUser) => {
   if (!auth0User || !curioUser) {
-    console.log("no user or curioUser");
     return null;
   }
   return (
@@ -38,6 +37,7 @@ const UserGreeting = (auth0User:any, curioUser:CurioUser) => {
 }
 
 const IndexPage: React.FC<PageProps> = () => {
+  const [userUpdated, setUserUpdated] = React.useState(false);
   const [curioUser, setCurioUser] = React.useState(new CurioUser());
 
   const {
@@ -47,8 +47,7 @@ const IndexPage: React.FC<PageProps> = () => {
     } = useAuth0();
   
   const updateUser = async () => {
-    if (!user || curioUser.id !== "") {
-      console.log("no user or already updated");
+    if (!user || curioUser.id !== "" || !localStorage) {
       return;
     }
     let cUser:CurioUser = new CurioUser();
@@ -70,15 +69,13 @@ const IndexPage: React.FC<PageProps> = () => {
       }
     } 
     setCurioUser(cUser);
-    console.log("Set cUser: " + cUser);
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && localStorage) {
     localStorage.removeItem("incrementedVisitCount");
   }
 
   useEffect(() => {
-    console.log("useEffect");
     updateUser();
   });
     
