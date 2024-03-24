@@ -25,6 +25,7 @@ const headingStyles = {
 
 const UserGreeting = (auth0User:any, curioUser:CurioUser) => {
   if (!auth0User || !curioUser) {
+    console.log("no user or curioUser");
     return null;
   }
   return (
@@ -47,6 +48,7 @@ const IndexPage: React.FC<PageProps> = () => {
   
   const updateUser = async () => {
     if (!user || curioUser.id !== "") {
+      console.log("no user or already updated");
       return;
     }
     let cUser:CurioUser = new CurioUser();
@@ -68,6 +70,7 @@ const IndexPage: React.FC<PageProps> = () => {
       }
     } 
     setCurioUser(cUser);
+    console.log("Set cUser: " + cUser);
   }
 
   if (!isAuthenticated) {
@@ -75,6 +78,7 @@ const IndexPage: React.FC<PageProps> = () => {
   }
 
   useEffect(() => {
+    console.log("useEffect");
     updateUser();
   });
     
