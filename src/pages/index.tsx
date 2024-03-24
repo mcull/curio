@@ -24,7 +24,7 @@ const headingStyles = {
 };
 
 const UserGreeting = (auth0User:any, curioUser:CurioUser) => {
-  if (!auth0User || !curioUser) {
+  if (!auth0User || curioUser.id === "") {
     return null;
   }
   return (
@@ -47,7 +47,7 @@ const IndexPage: React.FC<PageProps> = () => {
     } = useAuth0();
   
   const updateUser = async () => {
-    if (!user || curioUser.id !== "" || !localStorage) {
+    if (!user || curioUser.id !== "" || typeof localStorage === 'undefined') {
       return;
     }
     let cUser:CurioUser = new CurioUser();
@@ -65,13 +65,18 @@ const IndexPage: React.FC<PageProps> = () => {
       const lastVisit = cUser.visits[0];
       if (!lastVisit || (user.updated_at && lastVisit < user.updated_at)) {
         addUserVisit(cUser.id);
-        localStorage.setItem("incrementedVisitCount", "true");
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem("incrementedVisitCount", "true");
+        }
       }
     } 
-    setCurioUser(cUser);
+    if (cUser.visits.length > 0) {
+      console.log("cUser visits length" + cUser.visits.length);
+      setCurioUser(cUser);
+    }
   }
 
-  if (!isAuthenticated && localStorage) {
+  if (!isAuthenticated && typeof localStorage !== 'undefined') {
     localStorage.removeItem("incrementedVisitCount");
   }
 
