@@ -10,7 +10,7 @@ const logoImageClassName = "max-w-full aspect-square fill-[url(" + logo + ")_lig
 
 const Splash: React.FC = () => {
   return (
-    <div className="flex flex-col items-center px-5 pt-20 pb-8 font-bold bg-zinc-850 max-w-[375px] text-white text-opacity-80">
+    <div className="flex flex-col items-center px-5 pt-20 pb-8 font-bold bg-zinc-950 max-w-[375px] text-white text-opacity-80">
       <h1 className="mt-28 text-3xl">Welcome to FitTrack</h1>
       <p className="mt-6 text-base">Track your progress and stay motivated</p>
 
