@@ -32,7 +32,6 @@ export const addUserVisit = (userId: string) => {
           body: JSON.stringify({userId: userId})
         });
         const content = await rawResponse.json();
-        
       })();
     }
   }
